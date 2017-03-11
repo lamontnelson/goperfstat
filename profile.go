@@ -16,7 +16,7 @@ type FuncPerf struct {
 	start time.Time
 }
 
-func FunctionStats(context *PerfContext, id int) (*FuncPerf, error) {
+func GetFunctionStats(context *PerfContext, id int) (*FuncPerf, error) {
 	var perf *FuncPerf
 	var ok bool
 
@@ -35,7 +35,7 @@ func CountCalls(context *PerfContext, id int) *FuncPerf {
 		context = globalContext
 	}
 
-	perf, err := FunctionStats(context, id)
+	perf, err := GetFunctionStats(context, id)
 	if err != nil {
 		times := make(stats.Float64Data, 10)
 		times = times[:0]
@@ -62,7 +62,7 @@ func End(context *PerfContext, id int) {
 		context = globalContext
 	}
 
-	perf, err := FunctionStats(context, id)
+	perf, err := GetFunctionStats(context, id)
 	if err != nil {
 		panic("perf record not found")
 	}
