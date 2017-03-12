@@ -44,7 +44,7 @@ func (p *PerfContext) Report() {
 		if found {
 			fmt.Printf("\t%v: { count: %v%v }\n", name, len(samples.Samples), summary)
 		} else {
-			fmt.Printf("\tid %v: { count: %v%v }\n", id, len(samples.Samples), summary)
+			fmt.Printf("\tid_%v: { count: %v%v }\n", id, len(samples.Samples), summary)
 		}
 	}
 
@@ -55,7 +55,7 @@ func (p *PerfContext) Report() {
 		if found {
 			fmt.Printf("\t%v: { count: %v%v }\n", name, perf.count, summary)
 		} else {
-			fmt.Printf("\tid %v: { count: %v%v }\n", id, perf.count, summary)
+			fmt.Printf("\tid_%v: { count: %v%v }\n", id, perf.count, summary)
 		}
 	}
 }
