@@ -29,6 +29,18 @@ func (d *SampleDistribution) Sample(v float64) {
 	}
 }
 
+func TakeSample(context *PerfContext, id int, rate float32, capacity int, v float64) {
+	if context == nil {
+		context = globalContext
+	}
+	stats, err := GetSampleStats(context, id)
+	if err != nil {
+		stats = NewSampleDistribution(rate, capacity)
+		context.distributions[id] = stats
+	}
+	stats.Sample(v)
+}
+
 func GetSampleStats(context *PerfContext, id int) (*SampleDistribution, error) {
 	if context == nil {
 		context = globalContext

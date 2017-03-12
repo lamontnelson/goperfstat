@@ -2,6 +2,7 @@ package goperfstat
 
 import (
 	"fmt"
+	"github.com/montanaflynn/stats"
 )
 
 type PerfContext struct {
@@ -21,24 +22,40 @@ func NewPerfContext() *PerfContext {
 	}
 }
 
+func sampleSummary(samples stats.Float64Data) string {
+	var summary string
+	if len(samples) > 0 {
+		min, _ := samples.Min()
+		max, _ := samples.Max()
+		fifty, _ := samples.Percentile(50)
+		ninety, _ := samples.Percentile(90)
+		ninenine, _ := samples.Percentile(99)
+		summary = fmt.Sprintf("; 'min,50,90,99,max': [%v, %v, %v, %v, %v]", min, fifty, ninety, ninenine, max)
+	}
+	return summary
+}
+
 func (p *PerfContext) Report() {
-	for id, perf := range p.functions {
 
-		var timesSummary string
-		if len(perf.times) > 0 {
-			min, _ := perf.times.Min()
-			max, _ := perf.times.Max()
-			fifty, _ := perf.times.Percentile(50)
-			ninety, _ := perf.times.Percentile(90)
-			ninenine, _ := perf.times.Percentile(99)
-			timesSummary = fmt.Sprintf("; 'min,50,90,99,max': [%v, %v, %v, %v, %v]", min, fifty, ninety, ninenine, max)
+	fmt.Printf("Samples:\n")
+	for id, samples := range p.distributions {
+		summary := sampleSummary(samples.Samples)
+		name, found := p.SampleId2Name[id]
+		if found {
+			fmt.Printf("\t%v: { count: %v%v }\n", name, len(samples.Samples), summary)
+		} else {
+			fmt.Printf("\tid %v: { count: %v%v }\n", id, len(samples.Samples), summary)
 		}
+	}
 
+	fmt.Printf("Functions:\n")
+	for id, perf := range p.functions {
+		summary := sampleSummary(perf.times)
 		name, found := p.FuncId2Name[id]
 		if found {
-			fmt.Printf("%v: { count: %v%v }\n", name, perf.count, timesSummary)
+			fmt.Printf("\t%v: { count: %v%v }\n", name, perf.count, summary)
 		} else {
-			fmt.Printf("id %v: { count: %v%v }\n", id, perf.count, timesSummary)
+			fmt.Printf("\tid %v: { count: %v%v }\n", id, perf.count, summary)
 		}
 	}
 }

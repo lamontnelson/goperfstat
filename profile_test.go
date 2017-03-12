@@ -51,6 +51,17 @@ func TestProfile(t *testing.T) {
 			t.Fatalf("expected 2 calls; got %v", localContext.functions[id].count)
 		}
 	})
+
+	t.Run("Sample", func(t *testing.T) {
+		iters := 10000
+		rate := float32(.25)
+		c := int(float32(iters) * rate)
+		id := 1
+		for x := 0; x < iters; x++ {
+			TakeSample(nil, id, rate, c, float64(x))
+		}
+	})
+
 	globalContext.Report()
 	InitGlobalPerfContext()
 }
