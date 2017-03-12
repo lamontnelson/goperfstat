@@ -9,12 +9,12 @@ import (
 )
 
 type SampleDistribution struct {
-	rate    float32
+	rate    float64
 	Samples stats.Float64Data
 	r       *rand.Rand
 }
 
-func NewSampleDistribution(rate float32, capacity int) *SampleDistribution {
+func NewSampleDistribution(rate float64, capacity int) *SampleDistribution {
 	s := rand.NewSource(time.Now().UnixNano())
 	r := rand.New(s)
 	samples := make([]float64, capacity)
@@ -23,13 +23,13 @@ func NewSampleDistribution(rate float32, capacity int) *SampleDistribution {
 }
 
 func (d *SampleDistribution) Sample(v float64) {
-	f := d.r.Float32()
+	f := d.r.Float64()
 	if f < d.rate {
 		d.Samples = append(d.Samples, v)
 	}
 }
 
-func TakeSample(context *PerfContext, id int, rate float32, capacity int, v float64) {
+func TakeSample(context *PerfContext, id int, rate float64, capacity int, v float64) {
 	if context == nil {
 		context = globalContext
 	}
