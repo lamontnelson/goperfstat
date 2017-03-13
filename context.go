@@ -40,6 +40,16 @@ func sampleSummary(samples stats.Float64Data) string {
 
 func (p *PerfContext) Report() {
 
+	fmt.Printf("Counters:\n")
+	for id, counter := range p.counters {
+		name, found := p.Counter2Name[id]
+		if found {
+			fmt.Printf("\t%v: %v\n", name, counter.Count)
+		} else {
+			fmt.Printf("\tcounter_%v: %v\n", id, counter.Count)
+		}
+	}
+
 	fmt.Printf("Samples:\n")
 	for id, samples := range p.distributions {
 		summary := sampleSummary(samples.Samples)
@@ -47,7 +57,7 @@ func (p *PerfContext) Report() {
 		if found {
 			fmt.Printf("\t%v: { count: %v%v }\n", name, len(samples.Samples), summary)
 		} else {
-			fmt.Printf("\tid_%v: { count: %v%v }\n", id, len(samples.Samples), summary)
+			fmt.Printf("\tsample_%v: { count: %v%v }\n", id, len(samples.Samples), summary)
 		}
 	}
 
@@ -58,7 +68,7 @@ func (p *PerfContext) Report() {
 		if found {
 			fmt.Printf("\t%v: { count: %v%v }\n", name, perf.count, summary)
 		} else {
-			fmt.Printf("\tid_%v: { count: %v%v }\n", id, perf.count, summary)
+			fmt.Printf("\tfunction_%v: { count: %v%v }\n", id, perf.count, summary)
 		}
 	}
 }

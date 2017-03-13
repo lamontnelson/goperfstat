@@ -1,5 +1,10 @@
 package goperfstat
 
+import (
+	"errors"
+	"fmt"
+)
+
 type Counter struct {
 	id    int
 	Count float64
@@ -11,4 +16,34 @@ func NewCounter(id int) *Counter {
 
 func (c *Counter) Inc(v float64) {
 	c.Count += v
+}
+
+func GetCounter(context *PerfContext, id int) (*Counter, error) {
+	var counter *Counter
+	var found bool
+
+	if context == nil {
+		context = globalContext
+	}
+
+	if counter, found = context.counters[id]; !found {
+		return nil, errors.New(fmt.Sprintf("counter %v not found", id))
+	}
+
+	return counter, nil
+}
+
+func Count(context *PerfContext, id int, v float64) {
+	if context == nil {
+		context = globalContext
+	}
+
+	var counter *Counter
+
+	if counter, _ = GetCounter(context, id); counter == nil {
+		counter = NewCounter(id)
+		context.counters[id] = counter
+	}
+
+	counter.Inc(v)
 }
