@@ -9,6 +9,8 @@ type PerfContext struct {
 	functions     map[int]*FuncPerf
 	distributions map[int]*SampleDistribution
 	counters      map[int]*Counter
+}
+type PerfIdRegistry struct {
 	FuncId2Name   map[int]string
 	SampleId2Name map[int]string
 	Counter2Name  map[int]string
@@ -19,9 +21,6 @@ func NewPerfContext() *PerfContext {
 		functions:     make(map[int]*FuncPerf),
 		distributions: make(map[int]*SampleDistribution),
 		counters:      make(map[int]*Counter),
-		FuncId2Name:   make(map[int]string),
-		SampleId2Name: make(map[int]string),
-		Counter2Name:  make(map[int]string),
 	}
 }
 
@@ -42,7 +41,7 @@ func (p *PerfContext) Report() {
 
 	fmt.Printf("Counters:\n")
 	for id, counter := range p.counters {
-		name, found := p.Counter2Name[id]
+		name, found := globalIdRegistry.Counter2Name[id]
 		if found {
 			fmt.Printf("\t%v: %v\n", name, counter.Count)
 		} else {
@@ -53,7 +52,7 @@ func (p *PerfContext) Report() {
 	fmt.Printf("Samples:\n")
 	for id, samples := range p.distributions {
 		summary := sampleSummary(samples.Samples)
-		name, found := p.SampleId2Name[id]
+		name, found := globalIdRegistry.SampleId2Name[id]
 		if found {
 			fmt.Printf("\t%v: { count: %v%v }\n", name, len(samples.Samples), summary)
 		} else {
@@ -64,7 +63,7 @@ func (p *PerfContext) Report() {
 	fmt.Printf("Functions:\n")
 	for id, perf := range p.functions {
 		summary := sampleSummary(perf.times)
-		name, found := p.FuncId2Name[id]
+		name, found := globalIdRegistry.FuncId2Name[id]
 		if found {
 			fmt.Printf("\t%v: { count: %v%v }\n", name, perf.count, summary)
 		} else {
@@ -73,24 +72,45 @@ func (p *PerfContext) Report() {
 	}
 }
 
-func (p *PerfContext) RegFuncId(name string, id int) {
+func (p *PerfIdRegistry) RegFuncId(name string, id int) {
 	p.FuncId2Name[id] = name
 }
 
-func (p *PerfContext) RegDistId(name string, id int) {
+func (p *PerfIdRegistry) RegDistId(name string, id int) {
 	p.SampleId2Name[id] = name
 }
 
-func (p *PerfContext) RegCounterId(name string, id int) {
+func (p *PerfIdRegistry) RegCounterId(name string, id int) {
 	p.Counter2Name[id] = name
 }
 
 var globalContext *PerfContext
+var globalIdRegistry *PerfIdRegistry
 
-func InitGlobalPerfContext() {
+func initGlobalPerfContext() {
 	globalContext = NewPerfContext()
 }
 
+func InitGlobalPerfContext() {
+	initGlobalPerfContext()
+}
+func initIdRegistry() {
+	globalIdRegistry = &PerfIdRegistry{
+		FuncId2Name:   make(map[int]string),
+		SampleId2Name: make(map[int]string),
+		Counter2Name:  make(map[int]string),
+	}
+}
+
+func GlobalPerfContext() *PerfContext {
+	return globalContext
+}
+
+func IdRegistry() *PerfIdRegistry {
+	return globalIdRegistry
+}
+
 func init() {
-	InitGlobalPerfContext()
+	initIdRegistry()
+	initGlobalPerfContext()
 }

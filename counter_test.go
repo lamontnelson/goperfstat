@@ -4,8 +4,8 @@ import "testing"
 
 func TestCounter(t *testing.T) {
 	id := 0
-	InitGlobalPerfContext()
-	globalContext.RegCounterId("x", id)
+	initGlobalPerfContext()
+	globalIdRegistry.RegCounterId("x", id)
 
 	t.Run("CounterStartAt0", func(t *testing.T) {
 		Count(nil, id, 0)

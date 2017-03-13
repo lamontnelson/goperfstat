@@ -3,8 +3,8 @@ package goperfstat
 import "testing"
 
 func TestDistribution(t *testing.T) {
-	InitGlobalPerfContext()
-	globalContext.RegDistId("Sample", 1)
+	initGlobalPerfContext()
+	globalIdRegistry.RegDistId("Sample", 1)
 
 	t.Run("CanSampleData", func(t *testing.T) {
 		iters := 10000
@@ -17,5 +17,5 @@ func TestDistribution(t *testing.T) {
 	})
 
 	globalContext.Report()
-	InitGlobalPerfContext()
+	initGlobalPerfContext()
 }

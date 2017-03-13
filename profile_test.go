@@ -4,9 +4,9 @@ import "testing"
 import "time"
 
 func TestProfile(t *testing.T) {
-	InitGlobalPerfContext()
-	globalContext.RegFuncId("CountCalls", 0)
-	globalContext.RegFuncId("TimeCalls", 1)
+	initGlobalPerfContext()
+	globalIdRegistry.RegFuncId("CountCalls", 0)
+	globalIdRegistry.RegFuncId("TimeCalls", 1)
 
 	t.Run("CanCountCalls", func(t *testing.T) {
 		id := 0
@@ -53,5 +53,5 @@ func TestProfile(t *testing.T) {
 	})
 
 	globalContext.Report()
-	InitGlobalPerfContext()
+	initGlobalPerfContext()
 }
