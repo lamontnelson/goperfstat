@@ -8,17 +8,20 @@ import (
 type PerfContext struct {
 	functions     map[int]*FuncPerf
 	distributions map[int]*SampleDistribution
-
+	counters      map[int]*Counter
 	FuncId2Name   map[int]string
 	SampleId2Name map[int]string
+	Counter2Name  map[int]string
 }
 
 func NewPerfContext() *PerfContext {
 	return &PerfContext{
 		functions:     make(map[int]*FuncPerf),
 		distributions: make(map[int]*SampleDistribution),
+		counters:      make(map[int]*Counter),
 		FuncId2Name:   make(map[int]string),
 		SampleId2Name: make(map[int]string),
+		Counter2Name:  make(map[int]string),
 	}
 }
 
@@ -66,6 +69,10 @@ func (p *PerfContext) RegFuncId(name string, id int) {
 
 func (p *PerfContext) RegDistId(name string, id int) {
 	p.SampleId2Name[id] = name
+}
+
+func (p *PerfContext) RegCounterId(name string, id int) {
+	p.Counter2Name[id] = name
 }
 
 var globalContext *PerfContext
