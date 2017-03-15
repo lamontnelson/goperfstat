@@ -3,12 +3,14 @@ package goperfstat
 import (
 	"fmt"
 	"github.com/montanaflynn/stats"
+	"time"
 )
 
 type PerfContext struct {
 	functions     map[int]*FuncPerf
 	distributions map[int]*SampleDistribution
 	counters      map[int]*Counter
+	startTime     time.Time
 }
 type PerfIdRegistry struct {
 	FuncId2Name   map[int]string
@@ -21,6 +23,7 @@ func NewPerfContext() *PerfContext {
 		functions:     make(map[int]*FuncPerf),
 		distributions: make(map[int]*SampleDistribution),
 		counters:      make(map[int]*Counter),
+		startTime:     time.Now(),
 	}
 }
 
@@ -37,7 +40,12 @@ func sampleSummary(samples stats.Float64Data) string {
 	return summary
 }
 
+func (p *PerfContext) StartTime() {
+	p.startTime = time.Now()
+}
+
 func (p *PerfContext) Report() {
+	fmt.Printf("%v elapsed\n", time.Since(p.startTime))
 
 	fmt.Printf("Counters:\n")
 	for id, counter := range p.counters {
