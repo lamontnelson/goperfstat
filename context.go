@@ -3,6 +3,7 @@ package goperfstat
 import (
 	"fmt"
 	"github.com/montanaflynn/stats"
+	"sync"
 	"time"
 )
 
@@ -10,6 +11,7 @@ type PerfContext struct {
 	functions     map[int]*FuncPerf
 	distributions map[int]*SampleDistribution
 	counters      map[int]*Counter
+	counterMu     sync.Mutex
 	startTime     time.Time
 }
 type PerfIdRegistry struct {
