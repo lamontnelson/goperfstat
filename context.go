@@ -7,6 +7,10 @@ import (
 	"time"
 )
 
+const (
+	IdDelta = 1000
+)
+
 type PerfContext struct {
 	functions     map[int]*FuncPerf
 	distributions map[int]*SampleDistribution
@@ -18,6 +22,7 @@ type PerfIdRegistry struct {
 	FuncId2Name   map[int]string
 	SampleId2Name map[int]string
 	Counter2Name  map[int]string
+	nextId        int
 }
 
 func NewPerfContext() *PerfContext {
@@ -82,16 +87,25 @@ func (p *PerfContext) Report() {
 	}
 }
 
-func (p *PerfIdRegistry) RegFuncId(name string, id int) {
+func (p *PerfIdRegistry) RegFuncId(name string, id int) int {
 	p.FuncId2Name[id] = name
+	return id
 }
 
-func (p *PerfIdRegistry) RegDistId(name string, id int) {
+func (p *PerfIdRegistry) RegDistId(name string, id int) int {
 	p.SampleId2Name[id] = name
+	return id
 }
 
-func (p *PerfIdRegistry) RegCounterId(name string, id int) {
+func (p *PerfIdRegistry) RegCounterId(name string, id int) int {
 	p.Counter2Name[id] = name
+	return id
+}
+
+func (p *PerfIdRegistry) NextId() int {
+	res := p.nextId
+	p.nextId += IdDelta
+	return res
 }
 
 var globalContext *PerfContext
