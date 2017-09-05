@@ -33,6 +33,10 @@ func TakeSample(context *PerfContext, id int, rate float64, capacity int, v floa
 	if context == nil {
 		context = globalContext
 	}
+
+	context.distMu.Lock()
+	defer context.distMu.Unlock()
+
 	stats, err := GetSampleStats(context, id)
 	if err != nil {
 		stats = NewSampleDistribution(rate, capacity)

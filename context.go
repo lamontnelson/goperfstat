@@ -17,6 +17,7 @@ type PerfContext struct {
 	counters      map[int]*Counter
 	counterMu     sync.Mutex
 	funcMu        sync.Mutex
+	distMu        sync.Mutex
 	startTime     time.Time
 }
 type PerfIdRegistry struct {
