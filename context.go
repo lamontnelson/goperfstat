@@ -16,6 +16,7 @@ type PerfContext struct {
 	distributions map[int]*SampleDistribution
 	counters      map[int]*Counter
 	counterMu     sync.Mutex
+	funcMu        sync.Mutex
 	startTime     time.Time
 }
 type PerfIdRegistry struct {

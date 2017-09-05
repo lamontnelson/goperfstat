@@ -10,33 +10,37 @@ func TestProfile(t *testing.T) {
 
 	t.Run("CanCountCalls", func(t *testing.T) {
 		id := 0
-		CountCalls(nil, id)
-		CountCalls(nil, id)
+		TimeFuncCall(nil, id, time.Now())
+		TimeFuncCall(nil, id, time.Now())
 		if globalContext.functions[id].count != 2 {
 			t.Fatalf("expected 2 calls; got %v", globalContext.functions[id].count)
 		}
 	})
 
 	t.Run("CanTimeCalls", func(t *testing.T) {
+		var st time.Time
 		id := 1
 		sleepDuration := 10 * time.Millisecond
-		c := TimeCountCalls(nil, id)
-		time.Sleep(sleepDuration)
-		End(nil, id)
 
-		TimeCountCalls(nil, id)
+		st = time.Now()
 		time.Sleep(sleepDuration)
-		End(nil, id)
+		TimeFuncCall(nil, id, st)
 
-		TimeCountCalls(nil, id)
+		st = time.Now()
 		time.Sleep(sleepDuration)
-		End(nil, id)
+		TimeFuncCall(nil, id, st)
+
+		st = time.Now()
+		time.Sleep(sleepDuration)
+		TimeFuncCall(nil, id, st)
 
 		expectedLen := 3
-		if len(c.times) != expectedLen {
-			t.Fatalf("expected %v measurements; got %v", expectedLen, len(c.times))
+		times := globalContext.functions[id].times
+		l := len(times)
+		if l != expectedLen {
+			t.Fatalf("expected %v measurements; got %v", expectedLen, l)
 		}
-		d := time.Duration(c.times[0]) * time.Nanosecond
+		d := time.Duration(times[0]) * time.Nanosecond
 		if d < sleepDuration {
 			t.Fatalf("recorded duration is %v; expected at least %v", d, sleepDuration)
 		}
@@ -45,8 +49,9 @@ func TestProfile(t *testing.T) {
 	t.Run("CanUseLocalContext", func(t *testing.T) {
 		id := 0
 		localContext := NewPerfContext()
-		CountCalls(localContext, id)
-		CountCalls(localContext, id)
+		st := time.Now()
+		TimeFuncCall(localContext, id, st)
+		TimeFuncCall(localContext, id, st)
 		if localContext.functions[id].count != 2 {
 			t.Fatalf("expected 2 calls; got %v", localContext.functions[id].count)
 		}

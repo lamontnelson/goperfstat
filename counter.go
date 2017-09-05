@@ -21,8 +21,8 @@ func (c *Counter) Inc(v float64) {
 func getCounterUnlocked(context *PerfContext, id int) (*Counter, error) {
 	var counter *Counter
 	var found bool
-	
-    if context == nil {
+
+	if context == nil {
 		context = globalContext
 	}
 
@@ -34,7 +34,7 @@ func getCounterUnlocked(context *PerfContext, id int) (*Counter, error) {
 }
 
 func GetCounter(context *PerfContext, id int) (*Counter, error) {
-    if context == nil {
+	if context == nil {
 		context = globalContext
 	}
 
@@ -58,5 +58,4 @@ func Count(context *PerfContext, id int, v float64) {
 		context.counters[id] = counter
 	}
 	counter.Inc(v)
-
 }
