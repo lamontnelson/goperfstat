@@ -1,6 +1,7 @@
 package goperfstat
 
 import "testing"
+import "fmt"
 
 func TestDistribution(t *testing.T) {
 	initGlobalPerfContext()
@@ -16,6 +17,6 @@ func TestDistribution(t *testing.T) {
 		}
 	})
 
-	globalContext.Report()
+	fmt.Println(globalContext.Report())
 	initGlobalPerfContext()
 }

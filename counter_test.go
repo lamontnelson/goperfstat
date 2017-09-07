@@ -1,6 +1,7 @@
 package goperfstat
 
 import "testing"
+import "fmt"
 
 func TestCounter(t *testing.T) {
 	id := 0
@@ -23,5 +24,5 @@ func TestCounter(t *testing.T) {
 		}
 	})
 
-	globalContext.Report()
+	fmt.Println(globalContext.Report())
 }

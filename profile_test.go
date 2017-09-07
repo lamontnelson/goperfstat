@@ -2,6 +2,7 @@ package goperfstat
 
 import "testing"
 import "time"
+import "fmt"
 
 func TestProfile(t *testing.T) {
 	initGlobalPerfContext()
@@ -57,6 +58,6 @@ func TestProfile(t *testing.T) {
 		}
 	})
 
-	globalContext.Report()
+	fmt.Println(globalContext.Report())
 	initGlobalPerfContext()
 }

@@ -10,10 +10,6 @@ const (
 	ARR_SIZE = 10000
 )
 
-type FuncPerfCall struct {
-	start time.Time
-}
-
 type FuncPerf struct {
 	id int
 	// number of times function was called
