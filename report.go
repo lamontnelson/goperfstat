@@ -2,6 +2,7 @@ package goperfstat
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"github.com/montanaflynn/stats"
 	"strconv"
@@ -13,26 +14,34 @@ var (
 )
 
 type DistributionSummary struct {
-	percentiles map[string]float64
-	min         float64
-	max         float64
-	average     float64
-	stddev      float64
-	variance    float64
-	count       uint64
+	Percentiles map[string]float64
+	Min         float64
+	Max         float64
+	Average     float64
+	Stddev      float64
+	Variance    float64
+	Count       uint64
 }
 
 type PerfReport struct {
-	counters      map[string]float64
-	functions     map[string]DistributionSummary
-	distributions map[string]DistributionSummary
+	Counters      map[string]float64
+	Functions     map[string]DistributionSummary
+	Distributions map[string]DistributionSummary
+}
+
+func (p *PerfContext) ReportJson() []byte {
+	b, e := json.Marshal(p.ReportData())
+	if e != nil {
+		fmt.Printf("%v", e)
+	}
+	return b
 }
 
 func (p *PerfContext) ReportData() PerfReport {
 	r := PerfReport{
-		counters:      make(map[string]float64),
-		functions:     make(map[string]DistributionSummary),
-		distributions: make(map[string]DistributionSummary),
+		Counters:      make(map[string]float64),
+		Functions:     make(map[string]DistributionSummary),
+		Distributions: make(map[string]DistributionSummary),
 	}
 
 	for id, counter := range p.counters {
@@ -40,7 +49,7 @@ func (p *PerfContext) ReportData() PerfReport {
 		if !found {
 			name = fmt.Sprintf("$counter_%v", id)
 		}
-		r.counters[name] = counter.Count
+		r.Counters[name] = counter.Count
 	}
 
 	for id, samples := range p.distributions {
@@ -49,7 +58,7 @@ func (p *PerfContext) ReportData() PerfReport {
 		if !found {
 			name = fmt.Sprintf("sample_%v", id)
 		}
-		r.distributions[name] = summary
+		r.Distributions[name] = summary
 	}
 
 	for id, perf := range p.functions {
@@ -58,7 +67,7 @@ func (p *PerfContext) ReportData() PerfReport {
 		if !found {
 			name = fmt.Sprintf("function_%v", id)
 		}
-		r.functions[name] = summary
+		r.Functions[name] = summary
 	}
 
 	return r
@@ -66,17 +75,17 @@ func (p *PerfContext) ReportData() PerfReport {
 
 func CalculateDistributionSummary(samples stats.Float64Data) DistributionSummary {
 	var summary DistributionSummary
-	summary.count = uint64(samples.Len())
-	summary.percentiles = make(map[string]float64)
+	summary.Count = uint64(samples.Len())
+	summary.Percentiles = make(map[string]float64)
 	if len(samples) > 0 {
-		summary.min, _ = samples.Min()
-		summary.max, _ = samples.Max()
-		summary.average, _ = samples.Mean()
-		summary.stddev, _ = samples.StandardDeviation()
-		summary.variance, _ = samples.Variance()
+		summary.Min, _ = samples.Min()
+		summary.Max, _ = samples.Max()
+		summary.Average, _ = samples.Mean()
+		summary.Stddev, _ = samples.StandardDeviation()
+		summary.Variance, _ = samples.Variance()
 		for _, percentile := range SummaryPercentiles {
 			key := strconv.FormatFloat(percentile, 'f', -1, 32)
-			summary.percentiles[key], _ = samples.Percentile(percentile)
+			summary.Percentiles[key], _ = samples.Percentile(percentile)
 		}
 	}
 	return summary
