@@ -19,6 +19,7 @@ type PerfIdRegistry struct {
 	SampleId2Name map[int]string
 	Counter2Name  map[int]string
 	nextId        int
+	mu            sync.Mutex
 }
 
 func NewPerfContext() *PerfContext {
@@ -34,22 +35,31 @@ func (p *PerfContext) StartTime() {
 	p.startTime = time.Now()
 }
 
-func (p *PerfIdRegistry) RegFuncId(name string, id int) int {
+func (p *PerfIdRegistry) RegFunc(name string) int {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	id := p.newId()
 	p.FuncId2Name[id] = name
 	return id
 }
 
-func (p *PerfIdRegistry) RegDistId(name string, id int) int {
+func (p *PerfIdRegistry) RegDist(name string) int {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	id := p.newId()
 	p.SampleId2Name[id] = name
 	return id
 }
 
-func (p *PerfIdRegistry) RegCounterId(name string, id int) int {
+func (p *PerfIdRegistry) RegCounter(name string) int {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	id := p.newId()
 	p.Counter2Name[id] = name
 	return id
 }
 
-func (p *PerfIdRegistry) NextId() int {
+func (p *PerfIdRegistry) newId() int {
 	res := p.nextId
 	p.nextId++
 	return res
