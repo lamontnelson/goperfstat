@@ -34,7 +34,7 @@ type DistributionSummary struct {
 }
 
 type PerfReport struct {
-	Counters      map[string]float64
+	Counters      map[string]SafeFloat64
 	Functions     map[string]DistributionSummary
 	Distributions map[string]DistributionSummary
 }
@@ -49,7 +49,7 @@ func (p *PerfContext) ReportJson() []byte {
 
 func (p *PerfContext) ReportData() PerfReport {
 	r := PerfReport{
-		Counters:      make(map[string]float64),
+		Counters:      make(map[string]SafeFloat64),
 		Functions:     make(map[string]DistributionSummary),
 		Distributions: make(map[string]DistributionSummary),
 	}
@@ -59,7 +59,7 @@ func (p *PerfContext) ReportData() PerfReport {
 		if !found {
 			name = fmt.Sprintf("$counter_%v", id)
 		}
-		r.Counters[name] = counter.Count
+		r.Counters[name] = SafeFloat64(counter.Count)
 	}
 
 	for id, samples := range p.distributions {
