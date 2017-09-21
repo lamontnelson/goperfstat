@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/montanaflynn/stats"
+	"math"
 	"strconv"
 	"time"
 )
@@ -13,13 +14,22 @@ var (
 	SummaryPercentiles = []float64{50, 90, 99, 99.9, 100}
 )
 
+type SafeFloat64 float64
+
+func (f SafeFloat64) MarshalJSON() ([]byte, error) {
+	if math.IsNaN(float64(f)) {
+		return json.Marshal(nil)
+	}
+	return json.Marshal(float64(f))
+}
+
 type DistributionSummary struct {
-	Percentiles map[string]float64
-	Min         float64
-	Max         float64
-	Average     float64
-	Stddev      float64
-	Variance    float64
+	Percentiles map[string]SafeFloat64
+	Min         SafeFloat64
+	Max         SafeFloat64
+	Average     SafeFloat64
+	Stddev      SafeFloat64
+	Variance    SafeFloat64
 	Count       uint64
 }
 
@@ -76,16 +86,29 @@ func (p *PerfContext) ReportData() PerfReport {
 func CalculateDistributionSummary(samples stats.Float64Data) DistributionSummary {
 	var summary DistributionSummary
 	summary.Count = uint64(samples.Len())
-	summary.Percentiles = make(map[string]float64)
+	summary.Percentiles = make(map[string]SafeFloat64)
 	if len(samples) > 0 {
-		summary.Min, _ = samples.Min()
-		summary.Max, _ = samples.Max()
-		summary.Average, _ = samples.Mean()
-		summary.Stddev, _ = samples.StandardDeviation()
-		summary.Variance, _ = samples.Variance()
+		var f float64
+		f, _ = samples.Min()
+		summary.Min = SafeFloat64(f)
+
+		f, _ = samples.Max()
+		summary.Max = SafeFloat64(f)
+
+		f, _ = samples.Mean()
+		summary.Average = SafeFloat64(f)
+
+		f, _ = samples.StandardDeviation()
+		summary.Stddev = SafeFloat64(f)
+
+		f, _ = samples.Variance()
+		summary.Variance = SafeFloat64(f)
+
 		for _, percentile := range SummaryPercentiles {
 			key := strconv.FormatFloat(percentile, 'f', -1, 32)
-			summary.Percentiles[key], _ = samples.Percentile(percentile)
+
+			f, _ = samples.Percentile(percentile)
+			summary.Percentiles[key] = SafeFloat64(f)
 		}
 	}
 	return summary
